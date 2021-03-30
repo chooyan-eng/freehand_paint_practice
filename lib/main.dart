@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:drawapp_practice/freehand_painter.dart';
 import 'package:drawapp_practice/stroke.dart';
@@ -31,6 +32,10 @@ class _MyHomePageState extends State<MyHomePage> {
   var _currentWidth = 4.0;
 
   final _strokes = <Stroke>[];
+
+  late Size _canvasSize;
+
+  // start new stroke
   void _start() {
     _strokes.add(Stroke(
       color: _currentColor,
@@ -38,10 +43,22 @@ class _MyHomePageState extends State<MyHomePage> {
     ));
   }
 
+  // update stroke
   void _add(double x, double y) {
     setState(() {
       _strokes.last.points.add(Point(x, y));
     });
+  }
+
+  // convert Canvas to Image
+  Future<ui.Image> _convert() async {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final painter = FreehandPainter(_strokes);
+    painter.paint(canvas, _canvasSize);
+    return recorder
+        .endRecording()
+        .toImage(_canvasSize.width.floor(), _canvasSize.height.floor());
   }
 
   @override
@@ -70,8 +87,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       details.localPosition.dy,
                     );
                   },
-                  child: CustomPaint(
-                    painter: FreehandPainter(_strokes),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      _canvasSize =
+                          Size(constraints.maxWidth, constraints.maxHeight);
+                      return CustomPaint(
+                        painter: FreehandPainter(_strokes),
+                      );
+                    },
                   ),
                 ),
               ),

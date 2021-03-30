@@ -1,6 +1,12 @@
 # drawapp_practice
 
-A new Flutter project.
+A practice app project for drawing picture by hands.
+
+This project does NOT depend on any Flutter packages and build drawing feature using only Flutter standard Widgets and APIs.
+
+# DEMO
+
+![DEMO](./assets/draw_sample.gif)
 
 ## Getting Started
 
