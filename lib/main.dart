@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:drawapp_practice/freehand_painter.dart';
+import 'package:drawapp_practice/stroke.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,22 +27,21 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _strokes = <List<Point<double>>>[];
-  List<Point<double>> _currentStroke;
+  var _currentColor = Colors.black;
+  var _currentWidth = 4.0;
 
+  final _strokes = <Stroke>[];
   void _start() {
-    _currentStroke = <Point<double>>[];
-    _strokes.add(_currentStroke);
+    _strokes.add(Stroke(
+      color: _currentColor,
+      width: _currentWidth,
+    ));
   }
 
   void _add(double x, double y) {
     setState(() {
-      _currentStroke?.add(Point(x, y));
+      _strokes.last.points.add(Point(x, y));
     });
-  }
-
-  void _end() {
-    _currentStroke = null;
   }
 
   @override
@@ -70,13 +70,61 @@ class _MyHomePageState extends State<MyHomePage> {
                       details.localPosition.dy,
                     );
                   },
-                  onPanEnd: (details) => _end(),
                   child: CustomPaint(
                     painter: FreehandPainter(_strokes),
                   ),
                 ),
               ),
             ),
+            const SizedBox(height: 32),
+            Wrap(
+              spacing: 16,
+              children: [
+                Colors.black,
+                Colors.blue,
+                Colors.red,
+                Colors.green,
+                Colors.yellow
+              ].map(
+                (color) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _currentColor = color;
+                      });
+                    },
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        color: color,
+                        child: Center(
+                          child: _currentColor == color
+                              ? Icon(
+                                  Icons.brush,
+                                  color: Colors.white,
+                                )
+                              : SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ).toList(),
+            ),
+            const SizedBox(height: 32),
+            Slider(
+              max: 40,
+              min: 1,
+              value: _currentWidth,
+              onChanged: (value) {
+                setState(() {
+                  _currentWidth = value;
+                });
+              },
+            ),
+            const SizedBox(height: 60),
           ],
         ),
       ),
